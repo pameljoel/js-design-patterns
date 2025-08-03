@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Design Patterns Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 350px;
+      }
+      @media (min-width: 640px) {
+        .chart-container {
+          max-width: 500px;
+          height: 350px;
+        }
+      }
+      @media (min-width: 768px) {
+        .chart-container {
+          max-width: 600px;
+          height: 400px;
+        }
+      }
+      pre {
+        background-color: #e5e7eb;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      details > summary {
+        cursor: pointer;
+        list-style: none;
+      }
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
+      details > summary::before {
+        content: "▶ ";
+        margin-right: 0.5rem;
+      }
+      details[open] > summary::before {
+        content: "▼ ";
+      }
+      code {
+        font-family: "Fira Code", "Roboto Mono", monospace;
+      }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-zinc-800 font-sans min-h-screen flex flex-col">
+    <!-- Chosen Palette: Calm Harmony (stone-50, zinc-200, zinc-600, subtle accent colors for charts) -->
+    <!-- Application Structure Plan: The application uses a two-column dashboard-like layout. A fixed-width sidebar on the left provides navigation to each design pattern. The main content area on the right dynamically displays the selected pattern's explanation and code examples. An introductory section welcomes the user, and a small chart visualizes the distribution of pattern types. This structure prioritizes user understanding and ease of navigation by offering a constant overview of available patterns and focused detail on the current selection, preventing page reloads and reducing cognitive load. Code examples are collapsible to improve readability. -->
+    <!-- Visualization & Content Choices:
+    - Overall: Textual explanations for each pattern to provide context.
+    - Code Examples: Presented as pre-formatted text within collapsible <details> elements to manage visual density and allow users to expand/collapse code as needed.
+    - Pattern Category Distribution: Donut chart (Chart.js/Canvas) to visually summarize the types of design patterns (Creational, Structural, Behavioral), offering a quick data insight. This helps users grasp the categorisation of the patterns at a glance.
+    - Interaction: Navigation items (list of patterns) are clickable to dynamically load content. Collapsible <details> elements for code examples offer direct user control. The Chart.js chart provides interactive tooltips on hover.
+    - Justification: These choices balance comprehensive information delivery with an interactive, digestible format. The dashboard layout with dynamic content loading enhances exploration. Collapsible code sections prevent overwhelming the user. The donut chart provides a high-level data overview without requiring complex interaction, aligning with the goal of easy consumption.
+    - Library/Method: Vanilla JavaScript for all DOM manipulation, event handling, and data rendering. Chart.js for data visualization. Tailwind CSS for responsive styling and layout.
+    - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-zinc-200 shadow-md py-4 px-6 md:px-8">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <h1 class="text-3xl font-bold text-zinc-700">
+          JavaScript Design Patterns
+        </h1>
+      </div>
+    </header>
+
+    <main
+      class="flex-grow flex flex-col md:flex-row max-w-7xl mx-auto w-full px-4 py-6 md:px-8 space-y-6 md:space-y-0 md:space-x-6"
+    >
+      <!-- Sidebar Navigation -->
+      <aside
+        class="w-full md:w-64 bg-zinc-100 p-4 rounded-lg shadow-sm flex-shrink-0"
+      >
+        <h2 class="text-xl font-semibold mb-4 text-zinc-700">Patterns</h2>
+        <nav>
+          <ul id="pattern-list" class="space-y-2 text-zinc-600">
+            <!-- Pattern links will be dynamically loaded here -->
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <section
+        class="flex-grow bg-white p-6 rounded-lg shadow-lg overflow-y-auto max-h-[calc(100vh-140px)]"
+      >
+        <div id="welcome-section" class="mb-8">
+          <h2 class="text-2xl font-bold text-zinc-700 mb-4">
+            Welcome to the Interactive Design Patterns Guide
+          </h2>
+          <p class="text-zinc-600 leading-relaxed mb-4">
+            This single-page application is designed to help you easily explore
+            and understand common JavaScript design patterns. On the left,
+            you'll find a list of all patterns. Simply click on a pattern name
+            to load its detailed explanation and code examples here.
+          </p>
+          <p class="text-zinc-600 leading-relaxed">
+            Each pattern comes with a brief explanation, a more comprehensive
+            code example, and a simplified version to highlight the core
+            concept. The goal is to provide a clear, concise, and interactive
+            resource for learning these fundamental software design principles.
+          </p>
+        </div>
+
+        <div id="pattern-details" class="hidden">
+          <h2
+            id="pattern-title"
+            class="text-2xl font-bold text-zinc-700 mb-4"
+          ></h2>
+          <p
+            id="pattern-explanation"
+            class="text-zinc-600 leading-relaxed mb-6"
+          ></p>
+
+          <div class="mb-6">
+            <details>
+              <summary class="text-lg font-semibold text-zinc-700 py-2">
+                Brief Code Example
+              </summary>
+              <pre><code id="brief-code-example" class="language-javascript"></code></pre>
+            </details>
+          </div>
+
+          <div>
+            <details>
+              <summary class="text-lg font-semibold text-zinc-700 py-2">
+                Simplest Code
+              </summary>
+              <pre><code id="simplest-code" class="language-javascript"></code></pre>
+            </details>
+          </div>
+        </div>
+
+        <div id="patterns-overview" class="mt-8 pt-8 border-t border-zinc-200">
+          <h2 class="text-2xl font-bold text-zinc-700 mb-4">
+            Design Patterns Overview
+          </h2>
+          <p class="text-zinc-600 leading-relaxed mb-4">
+            This chart visually represents the distribution of the design
+            patterns across their main categories: Creational, Structural, and
+            Behavioral. It offers a quick way to understand the proportion of
+            patterns in each category.
+          </p>
+          <div class="chart-container">
+            <canvas id="pattern-category-chart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-zinc-200 py-4 px-6 md:px-8 mt-6">
+      <div class="max-w-7xl mx-auto text-center text-zinc-600 text-sm">
+        &copy; 2025 JavaScript Design Patterns Guide. All rights reserved.
+      </div>
+    </footer>
+
+    <script>
+      const patternsData = [
+        {
+          name: "Abstract Factory",
+          category: "Creational",
+          explanation:
+            "Provides an interface for creating families of related or dependent objects without specifying their concrete classes.",
+          briefCode: `// Abstract Products
+class Button {
+  render() { throw new Error("Method 'render()' must be implemented."); }
+}
+
+class Checkbox {
+  render() { throw new Error("Method 'render()' must be implemented."); }
+}
+
+// Concrete Products (Dark Theme)
+class DarkButton extends Button {
+  render() { console.log("Rendering Dark Button"); }
+}
+
+class DarkCheckbox extends Checkbox {
+  render() { console.log("Rendering Dark Checkbox"); }
+}
+
+// Concrete Products (Light Theme)
+class LightButton extends Button {
+  render() { console.log("Rendering Light Button"); }
+}
+
+class LightCheckbox extends Checkbox {
+  render() { console.log("Rendering Light Checkbox"); }
+}
+
+// Abstract Factory
+class GUIFactory {
+  createButton() { throw new Error("Method 'createButton()' must be implemented."); }
+  createCheckbox() { throw new Error("Method 'createCheckbox()' must be implemented."); }
+}
+
+// Concrete Factories
+class DarkGUIFactory extends GUIFactory {
+  createButton() { return new DarkButton(); }
+  createCheckbox() { return new DarkCheckbox(); }
+}
+
+class LightGUIFactory extends GUIFactory {
+  createButton() { return new LightButton(); }
+  createCheckbox() { return new LightCheckbox(); }
+}
+
+// Client Code
+function renderUI(factory) {
+  const button = factory.createButton();
+  const checkbox = factory.createCheckbox();
+  button.render();
+  checkbox.render();
+}
+
+console.log("Dark Theme UI:");
+renderUI(new DarkGUIFactory());
+
+console.log("\\nLight Theme UI:");
+renderUI(new LightGUIFactory());`,
+          simplestCode: `class ProductA { constructor(type) { this.type = type; } }
+class ProductB { constructor(type) { this.type = type; } }
+
+class ConcreteFactory1 {
+  createProductA() { return new ProductA("Type1A"); }
+  createProductB() { return new ProductB("Type1B"); }
+}
+
+class ConcreteFactory2 {
+  createProductA() { return new ProductA("Type2A"); }
+  createProductB() { return new ProductB("Type2B"); }
+}
+
+const factory1 = new ConcreteFactory1();
+console.log(factory1.createProductA()); // ProductA { type: 'Type1A' }
+console.log(factory1.createProductB()); // ProductB { type: 'Type1B' }`,
+        },
+        {
+          name: "Adapter",
+          category: "Structural",
+          explanation:
+            "Allows objects with incompatible interfaces to collaborate. It acts as a wrapper that translates calls from one interface to another.",
+          briefCode: `// The "Adaptee" - an existing class with an incompatible interface
+class OldCalculator {
+  add(operand1, operand2) {
+    return operand1 + operand2;
+  }
+}
+
+// The "Target" interface that the client expects
+class NewCalculator {
+  sum(a, b) {
+    throw new Error("Method 'sum()' must be implemented.");
+  }
+}
+
+// The "Adapter"
+class CalculatorAdapter extends NewCalculator {
+  constructor(oldCalculator) {
+    super();
+    this.oldCalculator = oldCalculator;
+  }
+
+  sum(a, b) {
+    // Translate the new interface call to the old interface call
+    return this.oldCalculator.add(a, b);
+  }
+}
+
+// Client code using the NewCalculator interface
+const newCalc = new CalculatorAdapter(new OldCalculator());
+console.log(\`Using adapter: 5 + 3 = \${newCalc.sum(5, 3)}\`);`,
+          simplestCode: `class OldService {
+  doOldStuff(data) { return \`Old: \${data}\`; }
+}
+
+class NewServiceAdapter {
+  constructor(oldService) { this.oldService = oldService; }
+  doNewStuff(input) { return this.oldService.doOldStuff(input); }
+}
+
+const old = new OldService();
+const adapter = new NewServiceAdapter(old);
+console.log(adapter.doNewStuff("hello")); // Old: hello`,
+        },
+        {
+          name: "Bridge",
+          category: "Structural",
+          explanation:
+            "Decouples an abstraction from its implementation so that the two can vary independently. It involves an abstraction and an implementor.",
+          briefCode: `// Implementor interface
+class DrawingAPI {
+  drawCircle(x, y, radius) { throw new Error("Method 'drawCircle()' must be implemented."); }
+}
+
+// Concrete Implementor 1
+class CanvasDrawingAPI extends DrawingAPI {
+  drawCircle(x, y, radius) {
+    console.log(\`Drawing Circle on Canvas at (\${x},\${y}) with radius \${radius}\`);
+  }
+}
+
+// Concrete Implementor 2
+class SVGDrawingAPI extends DrawingAPI {
+  drawCircle(x, y, radius) {
+    console.log(\`Drawing Circle on SVG at (\${x},\${y}) with radius \${radius}\`);
+  }
+}
+
+// Abstraction
+class Shape {
+  constructor(drawingAPI) {
+    this.drawingAPI = drawingAPI;
+  }
+  draw() { throw new Error("Method 'draw()' must be implemented."); }
+}
+
+// Refined Abstraction
+class Circle extends Shape {
+  constructor(x, y, radius, drawingAPI) {
+    super(drawingAPI);
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+  }
+
+  draw() {
+    this.drawingAPI.drawCircle(this.x, this.y, this.radius);
+  }
+}
+
+const canvasCircle = new Circle(1, 2, 3, new CanvasDrawingAPI());
+canvasCircle.draw();
+
+const svgCircle = new Circle(5, 7, 10, new SVGDrawingAPI());
+svgCircle.draw();`,
+          simplestCode: `class ImplementationA { operation() { return "Impl A"; } }
+class ImplementationB { operation() { return "Impl B"; } }
+
+class Abstraction {
+  constructor(implementation) { this.implementation = implementation; }
+  perform() { return \`Abstraction with \${this.implementation.operation()}\`; }
+}
+
+const absA = new Abstraction(new ImplementationA());
+console.log(absA.perform()); // Abstraction with Impl A`,
+        },
+        {
+          name: "Builder",
+          category: "Creational",
+          explanation:
+            "Separates the construction of a complex object from its representation, allowing the same construction process to create different representations.",
+          briefCode: `// Product
+class Car {
+  constructor() {
+    this.parts = {};
+  }
+  addPart(key, value) {
+    this.parts[key] = value;
+  }
+  show() {
+    console.log("Car built:", JSON.stringify(this.parts));
+  }
+}
+
+// Builder Interface
+class CarBuilder {
+  buildEngine() { throw new Error("Method 'buildEngine()' must be implemented."); }
+  buildWheels() { throw new Error("Method 'buildWheels()' must be implemented."); }
+  buildBody() { throw new Error("Method 'buildBody()' must be implemented."); }
+  getCar() { throw new Error("Method 'getCar()' must be implemented."); }
+}
+
+// Concrete Builder
+class SportsCarBuilder extends CarBuilder {
+  constructor() {
+    super();
+    this.car = new Car();
+  }
+  buildEngine() { this.car.addPart("engine", "V8 Sports Engine"); }
+  buildWheels() { this.car.addPart("wheels", "20-inch Alloy Wheels"); }
+  buildBody() { this.car.addPart("body", "Aerodynamic Sports Body"); }
+  getCar() { return this.car; }
+}
+
+// Director
+class Director {
+  construct(builder) {
+    builder.buildEngine();
+    builder.buildWheels();
+    builder.buildBody();
+    return builder.getCar();
+  }
+}
+
+const director = new Director();
+const sportsCarBuilder = new SportsCarBuilder();
+const sportsCar = director.construct(sportsCarBuilder);
+sportsCar.show();`,
+          simplestCode: `class Product { constructor() { this.parts = []; } add(part) { this.parts.push(part); } }
+
+class Builder {
+  constructor() { this.product = new Product(); }
+  buildPartA() { this.product.add("PartA"); return this; }
+  buildPartB() { this.product.add("PartB"); return this; }
+  getResult() { return this.product; }
+}
+
+const builder = new Builder();
+const p = builder.buildPartA().buildPartB().getResult();
+console.log(p.parts); // [ 'PartA', 'PartB' ]`,
+        },
+        {
+          name: "Chain of Responsibility",
+          category: "Behavioral",
+          explanation:
+            "Passes requests along a chain of handlers. Each handler decides either to process the request or to pass it to the next handler in the chain.",
+          briefCode: `class Handler {
+  setNext(handler) {
+    this.nextHandler = handler;
+    return handler;
+  }
+
+  handle(request) {
+    if (this.nextHandler) {
+      return this.nextHandler.handle(request);
+    }
+    return null; // No handler can process the request
+  }
+}
+
+class MonkeyHandler extends Handler {
+  handle(request) {
+    if (request === "Banana") {
+      return \`Monkey: I'll eat the \${request}.\`;
+    } else {
+      return super.handle(request);
+    }
+  }
+}
+
+class SquirrelHandler extends Handler {
+  handle(request) {
+    if (request === "Nut") {
+      return \`Squirrel: I'll eat the \${request}.\`;
+    } else {
+      return super.handle(request);
+    }
+  }
+}
+
+class DogHandler extends Handler {
+  handle(request) {
+    if (request === "Bone") {
+      return \`Dog: I'll chew the \${request}.\`;
+    } else {
+      return super.handle(request);
+    }
+  }
+}
+
+const monkey = new MonkeyHandler();
+const squirrel = new SquirrelHandler();
+const dog = new DogHandler();
+
+monkey.setNext(squirrel).setNext(dog);
+
+console.log(monkey.handle("Banana")); // Monkey: I'll eat the Banana.
+console.log(monkey.handle("Nut"));    // Squirrel: I'll eat the Nut.
+console.log(monkey.handle("Bone"));   // Dog: I'll chew the Bone.
+console.log(monkey.handle("Apple"));  // null`,
+          simplestCode: `class Handler {
+  setNext(next) { this.next = next; return next; }
+  handle(req) { return this.next ? this.next.handle(req) : null; }
+}
+
+class SpecificHandler1 extends Handler {
+  handle(req) { return req === "A" ? "Handled by 1" : super.handle(req); }
+}
+
+class SpecificHandler2 extends Handler {
+  handle(req) { return req === "B" ? "Handled by 2" : super.handle(req); }
+}
+
+const h1 = new SpecificHandler1();
+const h2 = new SpecificHandler2();
+h1.setNext(h2);
+
+console.log(h1.handle("A")); // Handled by 1
+console.log(h1.handle("B")); // Handled by 2`,
+        },
+        {
+          name: "Command",
+          category: "Behavioral",
+          explanation:
+            "Turns a request into a stand-alone object that contains all information about the request. This allows parameterizing clients with different requests, queueing or logging requests, and supporting undoable operations.",
+          briefCode: `// Receiver
+class Light {
+  turnOn() { console.log("Light is ON"); }
+  turnOff() { console.log("Light is OFF"); }
+}
+
+// Command Interface
+class Command {
+  execute() { throw new Error("Method 'execute()' must be implemented."); }
+}
+
+// Concrete Command: Turn On Light
+class TurnOnLightCommand extends Command {
+  constructor(light) {
+    super();
+    this.light = light;
+  }
+  execute() { this.light.turnOn(); }
+}
+
+// Concrete Command: Turn Off Light
+class TurnOffLightCommand extends Command {
+  constructor(light) {
+    super();
+    this.light = light;
+  }
+  execute() { this.light.turnOff(); }
+}
+
+// Invoker
+class RemoteControl {
+  setCommand(command) {
+    this.command = command;
+  }
+  pressButton() {
+    this.command.execute();
+  }
+}
+
+const livingRoomLight = new Light();
+const turnOn = new TurnOnLightCommand(livingRoomLight);
+const turnOff = new TurnOffLightCommand(livingRoomLight);
+
+const remote = new RemoteControl();
+
+remote.setCommand(turnOn);
+remote.pressButton(); // Light is ON
+
+remote.setCommand(turnOff);
+remote.pressButton(); // Light is OFF`,
+          simplestCode: `class Receiver { action() { console.log("Receiver action"); } }
+
+class Command {
+  constructor(receiver) { this.receiver = receiver; }
+  execute() { this.receiver.action(); }
+}
+
+class Invoker {
+  setCommand(cmd) { this.command = cmd; }
+  run() { this.command.execute(); }
+}
+
+const r = new Receiver();
+const c = new Command(r);
+const i = new Invoker();
+i.setCommand(c);
+i.run(); // Receiver action`,
+        },
+        {
+          name: "Composite",
+          category: "Structural",
+          explanation:
+            "Composes objects into tree structures to represent part-whole hierarchies. Composite lets clients treat individual objects and compositions of objects uniformly.",
+          briefCode: `// Component interface
+class Graphic {
+  draw() { throw new Error("Method 'draw()' must be implemented."); }
+}
+
+// Leaf
+class Dot extends Graphic {
+  constructor(x, y) {
+    super();
+    this.x = x;
+    this.y = y;
+  }
+  draw() {
+    console.log(\`Drawing a dot at (\${this.x}, \${this.y})\`);
+  }
+}
+
+// Leaf
+class Circle extends Graphic {
+  constructor(x, y, radius) {
+    super();
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+  }
+  draw() {
+    console.log(\`Drawing a circle at (\${this.x}, \${this.y}) with radius \${this.radius}\`);
+  }
+}
+
+// Composite
+class CompoundGraphic extends Graphic {
+  constructor() {
+    super();
+    this.children = [];
+  }
+
+  add(graphic) {
+    this.children.push(graphic);
+  }
+
+  remove(graphic) {
+    this.children = this.children.filter(child => child !== graphic);
+  }
+
+  draw() {
+    console.log("Drawing a compound graphic:");
+    for (const child of this.children) {
+      child.draw();
+    }
+  }
+}
+
+const dot1 = new Dot(10, 20);
+const circle1 = new Circle(30, 40, 5);
+
+const compound = new CompoundGraphic();
+compound.add(dot1);
+compound.add(circle1);
+
+const anotherCompound = new CompoundGraphic();
+anotherCompound.add(new Dot(50, 60));
+anotherCompound.add(compound); // Nested composite
+
+anotherCompound.draw();`,
+          simplestCode: `class Component { operation() { throw "Implement!"; } }
+
+class Leaf extends Component {
+  operation() { return "Leaf"; }
+}
+
+class Composite extends Component {
+  constructor() { super(); this.children = []; }
+  add(c) { this.children.push(c); }
+  operation() { return \`Composite(\${this.children.map(c => c.operation()).join(',')})\`; }
+}
+
+const leaf1 = new Leaf();
+const leaf2 = new Leaf();
+const comp = new Composite();
+comp.add(leaf1);
+comp.add(leaf2);
+console.log(comp.operation()); // Composite(Leaf,Leaf)`,
+        },
+        {
+          name: "Decorator",
+          category: "Structural",
+          explanation:
+            "Attaches new responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality.",
+          briefCode: `// Component interface
+class Coffee {
+  cost() { throw new Error("Method 'cost()' must be implemented."); }
+  description() { throw new Error("Method 'description()' must be implemented."); }
+}
+
+// Concrete Component
+class SimpleCoffee extends Coffee {
+  cost() { return 5; }
+  description() { return "Simple Coffee"; }
+}
+
+// Decorator Base Class
+class CoffeeDecorator extends Coffee {
+  constructor(coffee) {
+    super();
+    this.coffee = coffee;
+  }
+  cost() { return this.coffee.cost(); }
+  description() { return this.coffee.description(); }
+}
+
+// Concrete Decorator: Milk
+class MilkDecorator extends CoffeeDecorator {
+  constructor(coffee) {
+    super(coffee);
+  }
+  cost() { return super.cost() + 1; }
+  description() { return super.description() + ", Milk"; }
+}
+
+// Concrete Decorator: Sugar
+class SugarDecorator extends CoffeeDecorator {
+  constructor(coffee) {
+    super(coffee);
+  }
+  cost() { return super.cost() + 0.5; }
+  description() { return super.description() + ", Sugar"; }
+}
+
+let myCoffee = new SimpleCoffee();
+console.log(\`\${myCoffee.description()} costs $\${myCoffee.cost()}\`);
+
+myCoffee = new MilkDecorator(myCoffee);
+console.log(\`\${myCoffee.description()} costs $\${myCoffee.cost()}\`);
+
+myCoffee = new SugarDecorator(myCoffee);
+console.log(\`\${myCoffee.description()} costs $\${myCoffee.cost()}\`);`,
+          simplestCode: `class Component { operation() { return "Core"; } }
+
+class Decorator {
+  constructor(component) { this.component = component; }
+  operation() { return this.component.operation(); }
+}
+
+class ConcreteDecoratorA extends Decorator {
+  operation() { return \`A(\${super.operation()})\`; }
+}
+
+const c = new Component();
+const d = new ConcreteDecoratorA(c);
+console.log(d.operation()); // A(Core)`,
+        },
+        {
+          name: "Facade",
+          category: "Structural",
+          explanation:
+            "Provides a simplified interface to a complex subsystem. It hides the complexities of the system and provides a single entry point.",
+          briefCode: `// Subsystem 1
+class Amplifier {
+  on() { console.log("Amplifier On"); }
+  off() { console.log("Amplifier Off"); }
+  setVolume(volume) { console.log(\`Amplifier volume set to \${volume}\`); }
+}
+
+// Subsystem 2
+class Tuner {
+  on() { console.log("Tuner On"); }
+  off() { console.log("Tuner Off"); }
+  setFrequency(freq) { console.log(\`Tuner frequency set to \${freq}\`); }
+}
+
+// Subsystem 3
+class DVDPlayer {
+  on() { console.log("DVD Player On"); }
+  off() { console.log("DVD Player Off"); }
+  play(movie) { console.log(\`Playing movie: \${movie}\`); }
+}
+
+// Facade
+class HomeTheaterFacade {
+  constructor(amp, tuner, dvd) {
+    this.amplifier = amp;
+    this.tuner = tuner;
+    this.dvdPlayer = dvd;
+  }
+
+  watchMovie(movie) {
+    console.log("\\nGet ready to watch a movie...");
+    this.amplifier.on();
+    this.amplifier.setVolume(10);
+    this.tuner.off(); // Ensure tuner is off
+    this.dvdPlayer.on();
+    this.dvdPlayer.play(movie);
+  }
+
+  endMovie() {
+    console.log("\\nShutting down home theater...");
+    this.dvdPlayer.off();
+    this.amplifier.off();
+  }
+}
+
+const amp = new Amplifier();
+const tuner = new Tuner();
+const dvd = new DVDPlayer();
+
+const homeTheater = new HomeTheaterFacade(amp, tuner, dvd);
+
+homeTheater.watchMovie("The Matrix");
+homeTheater.endMovie();`,
+          simplestCode: `class SubsystemA { operationA() { return "A"; } }
+class SubsystemB { operationB() { return "B"; } }
+
+class Facade {
+  constructor() {
+    this.a = new SubsystemA();
+    this.b = new SubsystemB();
+  }
+  simplifiedOperation() {
+    return \`Combined: \${this.a.operationA()} + \${this.b.operationB()}\`;
+  }
+}
+
+const facade = new Facade();
+console.log(facade.simplifiedOperation()); // Combined: A + B`,
+        },
+        {
+          name: "Factory Method",
+          category: "Creational",
+          explanation:
+            "Defines an interface for creating an object, but lets subclasses decide which class to instantiate. The Factory Method lets a class defer instantiation to subclasses.",
+          briefCode: `// Product interface
+class Product {
+  operation() { throw new Error("Method 'operation()' must be implemented."); }
+}
+
+// Concrete Product A
+class ConcreteProductA extends Product {
+  operation() { return "Result of ConcreteProductA"; }
+}
+
+// Concrete Product B
+class ConcreteProductB extends Product {
+  operation() { return "Result of ConcreteProductB"; }
+}
+
+// Creator (Abstract Factory)
+class Creator {
+  // The factory method
+  factoryMethod() { throw new Error("Method 'factoryMethod()' must be implemented."); }
+
+  someOperation() {
+    const product = this.factoryMethod();
+    return \`Creator: The same creator's code has just worked with \${product.operation()}\`;
+  }
+}
+
+// Concrete Creator A
+class ConcreteCreatorA extends Creator {
+  factoryMethod() { return new ConcreteProductA(); }
+}
+
+// Concrete Creator B
+class ConcreteCreatorB extends Creator {
+  factoryMethod() { return new ConcreteProductB(); }
+}
+
+const creatorA = new ConcreteCreatorA();
+console.log(creatorA.someOperation());
+
+const creatorB = new ConcreteCreatorB();
+console.log(creatorB.someOperation());`,
+          simplestCode: `class Product { constructor(name) { this.name = name; } }
+
+class Creator {
+  createProduct(type) {
+    if (type === "A") return new Product("Product A");
+    if (type === "B") return new Product("Product B");
+    return null;
+  }
+}
+
+const creator = new Creator();
+console.log(creator.createProduct("A")); // Product { name: 'Product A' }`,
+        },
+        {
+          name: "Flyweight",
+          category: "Structural",
+          explanation:
+            "Reduces the number of objects created to improve performance and memory usage. It does this by sharing common parts of state among multiple objects instead of keeping all of the data in each object.",
+          briefCode: `// Flyweight (Intrinsic State: shared)
+class Character {
+  constructor(char, font, color) {
+    this.char = char;
+    this.font = font;
+    this.color = color;
+  }
+
+  display(x, y) {
+    console.log(\`Displaying '\${this.char}' at (\${x},\${y}) with font '\${this.font}' and color '\${this.color}'\`);
+  }
+}
+
+// Flyweight Factory
+class CharacterFactory {
+  constructor() {
+    this.characters = {};
+  }
+
+  getCharacter(char, font, color) {
+    const key = \`\${char}_\${font}_\${color}\`;
+    if (!this.characters[key]) {
+      this.characters[key] = new Character(char, font, color);
+      console.log(\`Creating new character flyweight: \${key}\`);
+    }
+    return this.characters[key];
+  }
+}
+
+// Client (Extrinsic State: unique to each instance)
+class TextEditor {
+  constructor() {
+    this.charFactory = new CharacterFactory();
+    this.document = []; // Stores characters with their positions
+  }
+
+  addCharacter(char, font, color, x, y) {
+    const characterFlyweight = this.charFactory.getCharacter(char, font, color);
+    this.document.push({ character: characterFlyweight, x, y });
+  }
+
+  renderDocument() {
+    console.log("\\nRendering Document:");
+    this.document.forEach(item => {
+      item.character.display(item.x, item.y);
+    });
+  }
+}
+
+const editor = new TextEditor();
+
+editor.addCharacter('H', 'Arial', 'Black', 10, 10);
+editor.addCharacter('e', 'Arial', 'Black', 20, 10);
+editor.addCharacter('l', 'Arial', 'Black', 30, 10);
+editor.addCharacter('l', 'Arial', 'Black', 40, 10); // Reuses 'l' flyweight
+editor.addCharacter('o', 'Arial', 'Black', 50, 10);
+
+editor.addCharacter('W', 'Times New Roman', 'Red', 10, 30);
+editor.addCharacter('o', 'Times New Roman', 'Red', 20, 30); // Reuses 'o' flyweight (different font/color)
+
+editor.renderDocument();`,
+          simplestCode: `const flyweights = {};
+
+class Flyweight {
+  constructor(sharedState) { this.sharedState = sharedState; }
+  operation(uniqueState) { return \`Shared: \${this.sharedState}, Unique: \${uniqueState}\`; }
+}
+
+function getFlyweight(sharedState) {
+  if (!flyweights[sharedState]) {
+    flyweights[sharedState] = new Flyweight(sharedState);
+  }
+  return flyweights[sharedState];
+}
+
+const fw1 = getFlyweight("A");
+const fw2 = getFlyweight("A"); // Same instance
+const fw3 = getFlyweight("B");
+
+console.log(fw1 === fw2); // true
+console.log(fw1.operation("X")); // Shared: A, Unique: X
+console.log(fw3.operation("Y")); // Shared: B, Unique: Y`,
+        },
+        {
+          name: "Interpreter",
+          category: "Behavioral",
+          explanation:
+            "Given a language, define a representation for its grammar along with an interpreter that uses the representation to interpret sentences in the language.",
+          briefCode: `// Abstract Expression
+class Expression {
+  interpret(context) { throw new Error("Method 'interpret()' must be implemented."); }
+}
+
+// Terminal Expression: Number
+class NumberExpression extends Expression {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
+  interpret(context) {
+    return this.value;
+  }
+}
+
+// Non-terminal Expression: Addition
+class AddExpression extends Expression {
+  constructor(left, right) {
+    super();
+    this.left = left;
+    this.right = right;
+  }
+  interpret(context) {
+    return this.left.interpret(context) + this.right.interpret(context);
+  }
+}
+
+// Non-terminal Expression: Subtraction
+class SubtractExpression extends Expression {
+  constructor(left, right) {
+    super();
+    this.left = left;
+    this.right = right;
+  }
+  interpret(context) {
+    return this.left.interpret(context) - this.right.interpret(context);
+  }
+}
+
+// Client code to build the abstract syntax tree and interpret
+// Example: (5 + 3) - 2
+const expression = new SubtractExpression(
+  new AddExpression(new NumberExpression(5), new NumberExpression(3)),
+  new NumberExpression(2)
+);
+
+const context = {}; // For more complex interpreters, this might hold variables etc.
+const result = expression.interpret(context);
+console.log(\`(5 + 3) - 2 = \${result}\`); // Output: (5 + 3) - 2 = 6`,
+          simplestCode: `class Expression { interpret() { throw "Implement!"; } }
+
+class TerminalExpression extends Expression {
+  constructor(value) { this.value = value; }
+  interpret() { return this.value; }
+}
+
+class AddExpression extends Expression {
+  constructor(exp1, exp2) { this.exp1 = exp1; this.exp2 = exp2; }
+  interpret() { return this.exp1.interpret() + this.exp2.interpret(); }
+}
+
+const exp = new AddExpression(new TerminalExpression(10), new TerminalExpression(5));
+console.log(exp.interpret()); // 15`,
+        },
+        {
+          name: "Iterator",
+          category: "Behavioral",
+          explanation:
+            "Provides a way to access the elements of an aggregate object sequentially without exposing its underlying representation.",
+          briefCode: `// Aggregate
+class MyCollection {
+  constructor() {
+    this.items = [];
+  }
+
+  addItem(item) {
+    this.items.push(item);
+  }
+
+  createIterator() {
+    return new MyCollectionIterator(this);
+  }
+}
+
+// Iterator
+class MyCollectionIterator {
+  constructor(collection) {
+    this.collection = collection;
+    this.position = 0;
+  }
+
+  hasNext() {
+    return this.position < this.collection.items.length;
+  }
+
+  next() {
+    if (this.hasNext()) {
+      return this.collection.items[this.position++];
+    }
+    return null; // Or throw an error
+  }
+
+  reset() {
+    this.position = 0;
+  }
+}
+
+const collection = new MyCollection();
+collection.addItem("Apple");
+collection.addItem("Banana");
+collection.addItem("Cherry");
+
+const iterator = collection.createIterator();
+
+while (iterator.hasNext()) {
+  console.log(iterator.next());
+}
+
+iterator.reset();
+console.log("After reset, first item:", iterator.next());`,
+          simplestCode: `class MyIterator {
+  constructor(arr) { this.arr = arr; this.idx = 0; }
+  next() { return this.idx < this.arr.length ? this.arr[this.idx++] : undefined; }
+  hasNext() { return this.idx < this.arr.length; }
+}
+
+const data = [1, 2, 3];
+const iter = new MyIterator(data);
+console.log(iter.next()); // 1
+console.log(iter.next()); // 2`,
+        },
+        {
+          name: "Mediator",
+          category: "Behavioral",
+          explanation:
+            "Defines an object that encapsulates how a set of objects interact. It promotes loose coupling by keeping objects from referring to each other explicitly, and it lets you vary their interaction independently.",
+          briefCode: `// Mediator interface
+class Chatroom {
+  sendMessage(message, user) { throw new Error("Method 'sendMessage()' must be implemented."); }
+  registerUser(user) { throw new Error("Method 'registerUser()' must be implemented."); }
+}
+
+// Concrete Mediator
+class ConcreteChatroom extends Chatroom {
+  constructor() {
+    super();
+    this.users = [];
+  }
+
+  registerUser(user) {
+    this.users.push(user);
+    user.setChatroom(this);
+  }
+
+  sendMessage(message, user) {
+    const time = new Date().toLocaleTimeString();
+    const sender = user.getName();
+
+    this.users.forEach(u => {
+      if (u !== user) { // Don't send message back to sender
+        u.receiveMessage(\`\${time} [\${sender}]: \${message}\`);
+      }
+    });
+  }
+}
+
+// Colleague
+class User {
+  constructor(name) {
+    this.name = name;
+    this.chatroom = null;
+  }
+
+  getName() { return this.name; }
+
+  setChatroom(chatroom) {
+    this.chatroom = chatroom;
+  }
+
+  send(message) {
+    if (this.chatroom) {
+      console.log(\`\${this.name} sends: \${message}\`);
+      this.chatroom.sendMessage(message, this);
+    } else {
+      console.log(\`\${this.name}: Not in a chatroom.\`);
+    }
+  }
+
+  receiveMessage(message) {
+    console.log(\`\${this.name} receives: \${message}\`);
+  }
+}
+
+const chatroom = new ConcreteChatroom();
+
+const john = new User("John");
+const jane = new User("Jane");
+const mike = new User("Mike");
+
+chatroom.registerUser(john);
+chatroom.registerUser(jane);
+chatroom.registerUser(mike);
+
+john.send("Hi everyone!");
+jane.send("Hey John!");
+mike.send("What's up?");`,
+          simplestCode: `class Mediator {
+  notify(sender, event) {
+    if (event === "A") this.colleagueB.doB();
+    if (event === "B") this.colleagueA.doA();
+  }
+}
+
+class ColleagueA {
+  constructor(mediator) { this.mediator = mediator; }
+  doA() { console.log("Colleague A does A"); this.mediator.notify(this, "A"); }
+}
+
+class ColleagueB {
+  constructor(mediator) { this.mediator = mediator; }
+  doB() { console.log("Colleague B does B"); this.mediator.notify(this, "B"); }
+}
+
+const m = new Mediator();
+m.colleagueA = new ColleagueA(m);
+m.colleagueB = new ColleagueB(m);
+
+m.colleagueA.doA(); // Colleague A does A, Colleague B does B`,
+        },
+        {
+          name: "Memento",
+          category: "Behavioral",
+          explanation:
+            "Without violating encapsulation, capture and externalize an object's internal state so that the object can be restored to this state later.",
+          briefCode: `// Originator
+class Editor {
+  constructor() {
+    this.content = "";
+  }
+
+  setContent(content) {
+    this.content = content;
+    console.log(\`Editor: Current content is "\${this.content}"\`);
+  }
+
+  save() {
+    console.log("Editor: Saving state...");
+    return new EditorMemento(this.content);
+  }
+
+  restore(memento) {
+    this.content = memento.getContent();
+    console.log(\`Editor: Restoring state to "\${this.content}"\`);
+  }
+}
+
+// Memento
+class EditorMemento {
+  constructor(content) {
+    this.content = content;
+  }
+
+  getContent() {
+    return this.content;
+  }
+}
+
+// Caretaker
+class History {
+  constructor() {
+    this.mementos = [];
+  }
+
+  save(editor) {
+    this.mementos.push(editor.save());
+  }
+
+  undo(editor) {
+    if (this.mementos.length === 0) {
+      console.log("History: No more states to undo.");
+      return;
+    }
+    const memento = this.mementos.pop();
+    editor.restore(memento);
+  }
+}
+
+const editor = new Editor();
+const history = new History();
+
+editor.setContent("First version of text.");
+history.save(editor);
+
+editor.setContent("Second version with more text.");
+history.save(editor);
+
+editor.setContent("Third and final version.");
+
+history.undo(editor); // Restores to "Second version with more text."
+history.undo(editor); // Restores to "First version of text."
+history.undo(editor); // No more states to undo.`,
+          simplestCode: `class Originator {
+  constructor(state) { this.state = state; }
+  createMemento() { return new Memento(this.state); }
+  restoreMemento(memento) { this.state = memento.getState(); }
+}
+
+class Memento {
+  constructor(state) { this.state = state; }
+  getState() { return this.state; }
+}
+
+class Caretaker {
+  constructor() { this.history = []; }
+  save(originator) { this.history.push(originator.createMemento()); }
+  undo(originator) { originator.restoreMemento(this.history.pop()); }
+}
+
+const o = new Originator("State 1");
+const c = new Caretaker();
+c.save(o);
+o.state = "State 2";
+console.log(o.state); // State 2
+c.undo(o);
+console.log(o.state); // State 1`,
+        },
+        {
+          name: "Observer",
+          category: "Behavioral",
+          explanation:
+            "Defines a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.",
+          briefCode: `// Subject (Publisher)
+class Subject {
+  constructor() {
+    this.observers = [];
+  }
+
+  addObserver(observer) {
+    this.observers.push(observer);
+  }
+
+  removeObserver(observer) {
+    this.observers = this.observers.filter(obs => obs !== observer);
+  }
+
+  notify(data) {
+    this.observers.forEach(observer => observer.update(data));
+  }
+}
+
+// Observer (Subscriber)
+class ConcreteObserverA {
+  constructor(name) {
+    this.name = name;
+  }
+  update(data) {
+    console.log(\`\${this.name} received update: \${data}\`);
+  }
+}
+
+class ConcreteObserverB {
+  constructor(name) {
+    this.name = name;
+  }
+  update(data) {
+    console.log(\`\${this.name} reacted to update: \${data.toUpperCase()}\`);
+  }
+}
+
+const mySubject = new Subject();
+
+const obs1 = new ConcreteObserverA("Observer A");
+const obs2 = new ConcreteObserverB("Observer B");
+const obs3 = new ConcreteObserverA("Observer C");
+
+mySubject.addObserver(obs1);
+mySubject.addObserver(obs2);
+mySubject.addObserver(obs3);
+
+mySubject.notify("Hello World!");
+
+mySubject.removeObserver(obs3);
+console.log("\\nAfter removing Observer C:");
+mySubject.notify("Another update.");`,
+          simplestCode: `class Subject {
+  constructor() { this.observers = []; }
+  add(obs) { this.observers.push(obs); }
+  notify(data) { this.observers.forEach(o => o.update(data)); }
+}
+
+class Observer {
+  constructor(name) { this.name = name; }
+  update(data) { console.log(\`\${this.name} got \${data}\`); }
+}
+
+const s = new Subject();
+const o1 = new Observer("O1");
+const o2 = new Observer("O2");
+s.add(o1);
+s.add(o2);
+s.notify("event"); // O1 got event, O2 got event`,
+        },
+        {
+          name: "Prototype",
+          category: "Creational",
+          explanation:
+            "Specifies the kind of objects to create using a prototypical instance, and creates new objects by copying this prototype.",
+          briefCode: `// Prototype
+const CarPrototype = {
+  init(model, color) {
+    this.model = model;
+    this.color = color;
+    return this; // For chaining or direct use
+  },
+  drive() {
+    console.log(\`Driving a \${this.color} \${this.model} car.\`);
+  },
+  clone() {
+    // Create a new object with this object as its prototype
+    // This performs a shallow copy of properties
+    return Object.create(this);
+  }
+};
+
+// Usage
+const sedanCar = Object.create(CarPrototype).init("Sedan", "Blue");
+sedanCar.drive(); // Driving a Blue Sedan car.
+
+const sportsCar = Object.create(CarPrototype).init("Sports", "Red");
+sportsCar.drive(); // Driving a Red Sports car.
+
+// Clone an existing car and modify it
+const clonedSedan = sedanCar.clone();
+clonedSedan.color = "Green";
+console.log("Original sedan:", sedanCar.color);    // Blue
+console.log("Cloned sedan:", clonedSedan.color); // Green
+clonedSedan.drive(); // Driving a Green Sedan car.
+
+// Using ES6 class syntax for a more "class-like" prototype
+class Vehicle {
+  constructor(type) {
+    this.type = type;
+  }
+  clone() {
+    // Deep copy if necessary, otherwise shallow copy
+    return Object.create(this);
+  }
+  info() {
+    console.log(\`This is a \${this.type} vehicle.\`);
+  }
+}
+
+const car = new Vehicle("Car");
+const truck = car.clone();
+truck.type = "Truck";
+
+car.info();   // This is a Car vehicle.
+truck.info(); // This is a Truck vehicle.`,
+          simplestCode: `const myPrototype = {
+  value: 10,
+  clone() { return Object.create(this); }
+};
+
+const obj1 = myPrototype.clone();
+const obj2 = myPrototype.clone();
+
+obj1.value = 20;
+
+console.log(myPrototype.value); // 10
+console.log(obj1.value);        // 20
+console.log(obj2.value);        // 10 (still inherits from prototype)`,
+        },
+        {
+          name: "Proxy",
+          category: "Structural",
+          explanation:
+            "Provides a surrogate or placeholder for another object to control access to it.",
+          briefCode: `// Subject interface (Implicit in JS)
+// class Subject {
+//   request() { throw new Error("Method 'request()' must be implemented."); }
+// }
+
+// Real Subject
+class RealSubject {
+  request() {
+    console.log("RealSubject: Handling request.");
+  }
+}
+
+// Proxy
+class ProxySubject {
+  constructor(realSubject) {
+    this.realSubject = realSubject || new RealSubject(); // Lazy initialization
+  }
+
+  request() {
+    // Pre-processing
+    console.log("Proxy: Logging before request.");
+
+    // Control access
+    if (this.checkAccess()) {
+      this.realSubject.request(); // Call the real subject's method
+      // Post-processing
+      this.logAccess();
+    } else {
+      console.log("Proxy: Access denied.");
+    }
+  }
+
+  checkAccess() {
+    // Some access control logic
+    console.log("Proxy: Checking access.");
+    return true; // For demonstration, always grant access
+  }
+
+  logAccess() {
+    console.log("Proxy: Logging access time.");
+  }
+}
+
+const real = new RealSubject();
+const proxy = new ProxySubject(real);
+
+console.log("Client calling proxy:");
+proxy.request();
+
+console.log("\\nClient calling real subject directly (bypassing proxy):");
+real.request();`,
+          simplestCode: `const realObject = {
+  value: 10,
+  getValue() { return this.value; }
+};
+
+const proxy = new Proxy(realObject, {
+  get: function(target, prop) {
+    if (prop === 'getValue') {
+      console.log("Proxy: Intercepting getValue()");
+      return function() {
+        return target.getValue() * 2; // Modify behavior
+      };
+    }
+    return target[prop];
+  }
+});
+
+console.log(realObject.getValue()); // 10
+console.log(proxy.getValue());      // Proxy: Intercepting getValue(), 20`,
+        },
+        {
+          name: "Singleton",
+          category: "Creational",
+          explanation:
+            "Ensures a class has only one instance, and provides a global point of access to that instance.",
+          briefCode: `class DatabaseConnection {
+  constructor() {
+    if (DatabaseConnection.instance) {
+      return DatabaseConnection.instance;
+    }
+    this.connection = "Connected to Database";
+    console.log("Establishing new database connection...");
+    DatabaseConnection.instance = this;
+  }
+
+  getConnection() {
+    return this.connection;
+  }
+}
+
+const db1 = new DatabaseConnection();
+console.log(db1.getConnection());
+
+const db2 = new DatabaseConnection(); // This will return the same instance as db1
+console.log(db2.getConnection());
+
+console.log(db1 === db2); // true, confirms it's the same instance
+
+// Another common way using an IIFE (Immediately Invoked Function Expression)
+const SingletonLogger = (function() {
+  let instance;
+
+  function createInstance() {
+    const object = new Object("Logger Instance");
+    console.log("Logger: Creating new instance...");
+    return object;
+  }
+
+  return {
+    getInstance: function() {
+      if (!instance) {
+        instance = createInstance();
+      }
+      return instance;
+    }
+  };
+})();
+
+const logger1 = SingletonLogger.getInstance();
+const logger2 = SingletonLogger.getInstance();
+
+console.log(logger1 === logger2); // true`,
+          simplestCode: `let instance;
+class Singleton {
+  constructor() {
+    if (instance) return instance;
+    instance = this;
+    this.id = Math.random(); // Unique property
+  }
+}
+
+const s1 = new Singleton();
+const s2 = new Singleton();
+console.log(s1 === s2); // true
+console.log(s1.id === s2.id); // true`,
+        },
+        {
+          name: "State",
+          category: "Behavioral",
+          explanation:
+            "Allows an object to alter its behavior when its internal state changes. The object will appear to change its class.",
+          briefCode: `// State interface
+class State {
+  handle(context) { throw new Error("Method 'handle()' must be implemented."); }
+}
+
+// Concrete State A
+class ConcreteStateA extends State {
+  handle(context) {
+    console.log("State A: Handling request. Transitioning to State B.");
+    context.setState(new ConcreteStateB());
+  }
+}
+
+// Concrete State B
+class ConcreteStateB extends State {
+  handle(context) {
+    console.log("State B: Handling request. Transitioning to State A.");
+    context.setState(new ConcreteStateA());
+  }
+}
+
+// Context
+class Context {
+  constructor(state) {
+    this.setState(state);
+  }
+
+  setState(state) {
+    this.state = state;
+    console.log(\`Context: State changed to \${state.constructor.name}\`);
+  }
+
+  request() {
+    this.state.handle(this);
+  }
+}
+
+const context = new Context(new ConcreteStateA());
+
+context.request(); // State A handles, transitions to B
+context.request(); // State B handles, transitions to A
+context.request(); // State A handles, transitions to B`,
+          simplestCode: `class StateA { handle(context) { context.state = new StateB(); return "Handled by A"; } }
+class StateB { handle(context) { context.state = new StateA(); return "Handled by B"; } }
+
+class Context {
+  constructor() { this.state = new StateA(); }
+  request() { return this.state.handle(this); }
+}
+
+const c = new Context();
+console.log(c.request()); // Handled by A
+console.log(c.request()); // Handled by B`,
+        },
+        {
+          name: "Strategy",
+          category: "Behavioral",
+          explanation:
+            "Defines a family of algorithms, encapsulates each one, and makes them interchangeable. Strategy lets the algorithm vary independently from clients that use it.",
+          briefCode: `// Strategy interface (implicit in JS)
+// class PaymentStrategy {
+//   pay(amount) { throw new Error("Method 'pay()' must be implemented."); }
+// }
+
+// Concrete Strategy: Credit Card Payment
+class CreditCardPayment {
+  pay(amount) {
+    console.log(\`Paid $\${amount} using Credit Card.\`);
+  }
+}
+
+// Concrete Strategy: PayPal Payment
+class PayPalPayment {
+  pay(amount) {
+    console.log(\`Paid $\${amount} using PayPal.\`);
+  }
+}
+
+// Concrete Strategy: Bank Transfer Payment
+class BankTransferPayment {
+  pay(amount) {
+    console.log(\`Paid $\${amount} using Bank Transfer.\`);
+  }
+}
+
+// Context
+class ShoppingCart {
+  constructor(paymentStrategy) {
+    this.paymentStrategy = paymentStrategy;
+    this.items = [];
+  }
+
+  addItem(item, price) {
+    this.items.push({ item, price });
+  }
+
+  setPaymentStrategy(strategy) {
+    this.paymentStrategy = strategy;
+  }
+
+  checkout() {
+    const total = this.items.reduce((sum, item) => sum + item.price, 0);
+    console.log(\`\\nTotal amount: $\${total}\`);
+    if (this.paymentStrategy) {
+      this.paymentStrategy.pay(total);
+    } else {
+      console.log("No payment strategy set.");
+    }
+  }
+}
+
+const cart = new ShoppingCart();
+cart.addItem("Laptop", 1200);
+cart.addItem("Mouse", 25);
+
+cart.setPaymentStrategy(new CreditCardPayment());
+cart.checkout();
+
+cart.setPaymentStrategy(new PayPalPayment());
+cart.checkout();
+
+cart.setPaymentStrategy(new BankTransferPayment());
+cart.checkout();`,
+          simplestCode: `class StrategyA { execute() { return "Strategy A"; } }
+class StrategyB { execute() { return "Strategy B"; } }
+
+class Context {
+  constructor(strategy) { this.strategy = strategy; }
+  setStrategy(strategy) { this.strategy = strategy; }
+  performAction() { return this.strategy.execute(); }
+}
+
+const c = new Context(new StrategyA());
+console.log(c.performAction()); // Strategy A
+c.setStrategy(new StrategyB());
+console.log(c.performAction()); // Strategy B`,
+        },
+        {
+          name: "Template Method",
+          category: "Behavioral",
+          explanation:
+            "Defines the skeleton of an algorithm in an operation, deferring some steps to subclasses. Template Method lets subclasses redefine certain steps of an algorithm without changing the algorithm's structure.",
+          briefCode: `// Abstract Class (Template)
+class BuildHouseTemplate {
+  // The template method
+  buildHouse() {
+    this.prepareFoundation();
+    this.buildWalls();
+    this.buildRoof();
+    this.installWindowsAndDoors();
+    this.decorateHouse(); // Hook method, can be overridden or left empty
+    console.log("House built successfully!\\n");
+  }
+
+  // Abstract steps (must be implemented by subclasses)
+  prepareFoundation() { throw new Error("Method 'prepareFoundation()' must be implemented."); }
+  buildWalls() { throw new Error("Method 'buildWalls()' must be implemented."); }
+  buildRoof() { throw new Error("Method 'buildRoof()' must be implemented."); }
+  installWindowsAndDoors() { throw new Error("Method 'installWindowsAndDoors()' must be implemented."); }
+
+  // Hook method (optional to override)
+  decorateHouse() {
+    console.log("Default: No special decoration.");
+  }
+}
+
+// Concrete Class: Wooden House
+class WoodenHouse extends BuildHouseTemplate {
+  prepareFoundation() { console.log("Preparing wooden foundation."); }
+  buildWalls() { console.log("Building wooden walls."); }
+  buildRoof() { console.log("Building wooden roof."); }
+  installWindowsAndDoors() { console.log("Installing wooden windows and doors."); }
+  decorateHouse() { console.log("Decorating with rustic wooden finishes."); } // Overriding hook
+}
+
+// Concrete Class: Concrete House
+class ConcreteHouse extends BuildHouseTemplate {
+  prepareFoundation() { console.log("Preparing concrete foundation."); }
+  buildWalls() { console.log("Building concrete walls."); }
+  buildRoof() { console.log("Building concrete roof."); }
+  installWindowsAndDoors() { console.log("Installing aluminum windows and steel doors."); }
+  // decorateHouse() is not overridden, so default will be used
+}
+
+console.log("Building a Wooden House:");
+const woodenHouse = new WoodenHouse();
+woodenHouse.buildHouse();
+
+console.log("Building a Concrete House:");
+const concreteHouse = new ConcreteHouse();
+concreteHouse.buildHouse();`,
+          simplestCode: `class AbstractClass {
+  templateMethod() {
+    this.step1();
+    this.step2();
+    this.hook(); // Optional hook
+  }
+  step1() { console.log("Abstract: Step 1"); }
+  step2() { throw "Implement step2!"; } // Abstract step
+  hook() { console.log("Abstract: Hook"); }
+}
+
+class ConcreteClass extends AbstractClass {
+  step2() { console.log("Concrete: Step 2 implemented"); }
+  hook() { console.log("Concrete: Hook overridden"); }
+}
+
+const c = new ConcreteClass();
+c.templateMethod();
+// Abstract: Step 1
+// Concrete: Step 2 implemented
+// Concrete: Hook overridden`,
+        },
+        {
+          name: "Visitor",
+          category: "Behavioral",
+          explanation:
+            "Represents an operation to be performed on the elements of an object structure. Visitor lets you define a new operation without changing the classes of the elements on which it operates.",
+          briefCode: `// Element interface
+class Element {
+  accept(visitor) { throw new Error("Method 'accept()' must be implemented."); }
+}
+
+// Concrete Element A
+class ConcreteElementA extends Element {
+  accept(visitor) {
+    visitor.visitConcreteElementA(this);
+  }
+  operationA() {
+    return "Operation A from ConcreteElementA";
+  }
+}
+
+// Concrete Element B
+class ConcreteElementB extends Element {
+  accept(visitor) {
+    visitor.visitConcreteElementB(this);
+  }
+  operationB() {
+    return "Operation B from ConcreteElementB";
+  }
+}
+
+// Visitor interface
+class Visitor {
+  visitConcreteElementA(element) { throw new Error("Method 'visitConcreteElementA()' must be implemented."); }
+  visitConcreteElementB(element) { throw new Error("Method 'visitConcreteElementB()' must be implemented."); }
+}
+
+// Concrete Visitor 1: XML Export Visitor
+class XMLExportVisitor extends Visitor {
+  visitConcreteElementA(element) {
+    console.log(\`Exporting ConcreteElementA to XML: <elementA>\${element.operationA()}</elementA>\`);
+  }
+  visitConcreteElementB(element) {
+    console.log(\`Exporting ConcreteElementB to XML: <elementB>\${element.operationB()}</elementB>\`);
+  }
+}
+
+// Concrete Visitor 2: JSON Export Visitor
+class JSONExportVisitor extends Visitor {
+  visitConcreteElementA(element) {
+    console.log(\`Exporting ConcreteElementA to JSON: { "elementA": "\${element.operationA()}" }\`);
+  }
+  visitConcreteElementB(element) {
+    console.log(\`Exporting ConcreteElementB to JSON: { "elementB": "\${element.operationB()}" }\`);
+  }
+}
+
+const elements = [new ConcreteElementA(), new ConcreteElementB()];
+
+const xmlVisitor = new XMLExportVisitor();
+console.log("Using XML Export Visitor:");
+elements.forEach(element => element.accept(xmlVisitor));
+
+const jsonVisitor = new JSONExportVisitor();
+console.log("\\nUsing JSON Export Visitor:");
+elements.forEach(element => element.accept(jsonVisitor));`,
+          simplestCode: `class ElementA { accept(v) { v.visitA(this); } }
+class ElementB { accept(v) { v.visitB(this); } }
+
+class Visitor {
+  visitA(e) { console.log("Visitor visiting A"); }
+  visitB(e) { console.log("Visitor visiting B"); }
+}
+
+const elements = [new ElementA(), new ElementB()];
+const visitor = new Visitor();
+
+elements.forEach(e => e.accept(visitor));
+// Visitor visiting A
+// Visitor visiting B`,
+        },
+      ];
+
+      const patternListElement = document.getElementById("pattern-list");
+      const welcomeSection = document.getElementById("welcome-section");
+      const patternDetailsSection = document.getElementById("pattern-details");
+      const patternTitle = document.getElementById("pattern-title");
+      const patternExplanation = document.getElementById("pattern-explanation");
+      const briefCodeExample = document.getElementById("brief-code-example");
+      const simplestCode = document.getElementById("simplest-code");
+
+      let myChart = null;
+
+      function renderPatternList() {
+        patternListElement.innerHTML = "";
+        patternsData.forEach((pattern) => {
+          const listItem = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = "#";
+          link.textContent = pattern.name;
+          link.classList.add(
+            "block",
+            "p-2",
+            "rounded-md",
+            "hover:bg-zinc-200",
+            "transition-colors",
+            "duration-200"
+          );
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            displayPatternDetails(pattern);
+            // Remove active class from all and add to clicked
+            document.querySelectorAll("#pattern-list a").forEach((item) => {
+              item.classList.remove("bg-zinc-300", "font-semibold");
+            });
+            link.classList.add("bg-zinc-300", "font-semibold");
+          });
+          listItem.appendChild(link);
+          patternListElement.appendChild(listItem);
+        });
+      }
+
+      function displayPatternDetails(pattern) {
+        welcomeSection.classList.add("hidden");
+        patternDetailsSection.classList.remove("hidden");
+
+        patternTitle.textContent = pattern.name;
+        patternExplanation.textContent = pattern.explanation;
+        // Use innerHTML instead of textContent for code blocks to display literal < and >
+        briefCodeExample.innerHTML = pattern.briefCode;
+        simplestCode.innerHTML = pattern.simplestCode;
+
+        // Reset details elements to closed state
+        patternDetailsSection.querySelectorAll("details").forEach((detail) => {
+          detail.open = false;
+        });
+      }
+
+      function createPatternCategoryChart() {
+        const ctx = document
+          .getElementById("pattern-category-chart")
+          .getContext("2d");
+        const categoryCounts = patternsData.reduce((acc, pattern) => {
+          acc[pattern.category] = (acc[pattern.category] || 0) + 1;
+          return acc;
+        }, {});
+
+        const labels = Object.keys(categoryCounts);
+        const data = Object.values(categoryCounts);
+
+        const colors = [
+          "rgba(129, 140, 248, 0.8)",
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(16, 185, 129, 0.8)",
+          "rgba(249, 115, 22, 0.8)",
+          "rgba(234, 179, 8, 0.8)",
+        ];
+
+        if (myChart) {
+          myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                data: data,
+                backgroundColor: colors.slice(0, labels.length),
+                borderColor: "#ffffff",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "#525252",
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed !== null) {
+                      label += context.parsed + " patterns";
+                    }
+                    return label;
+                  },
+                  title: function (context) {
+                    return context[0].label;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        renderPatternList();
+        createPatternCategoryChart();
+      });
+    </script>
+  </body>
+</html>
