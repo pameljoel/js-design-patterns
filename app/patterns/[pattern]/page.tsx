@@ -1,26 +1,3 @@
-import { Metadata } from "next";
-export async function generateMetadata({
-  params,
-}: {
-  params: { pattern: string };
-}): Promise<Metadata> {
-  const patternId = params.pattern;
-  const patternObj = patternsData.find(
-    (p: Pattern) => p.name.toLowerCase().replace(/\s+/g, "-") === patternId
-  );
-  if (!patternObj) {
-    return {
-      title: "Pattern Not Found | JavaScript Design Patterns",
-      description: "Pattern not found. Browse all JavaScript design patterns.",
-    };
-  }
-  return {
-    title: `${patternObj.name} | JavaScript Design Patterns`,
-    description:
-      patternObj.explanation ||
-      `Learn about the ${patternObj.name} pattern in JavaScript.`,
-  };
-}
 import PatternDetail from "../PatternDetail";
 import { patternsData, Pattern } from "../patternsData";
 import { notFound } from "next/navigation";

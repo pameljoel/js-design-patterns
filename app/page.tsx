@@ -1,12 +1,4 @@
 "use client";
-
-export async function generateMetadata() {
-  return {
-    title: "JavaScript Design Patterns | Home",
-    description:
-      "A comprehensive interactive guide to JavaScript design patterns, including code examples and explanations for each pattern.",
-  };
-}
 import { useState, useRef, useEffect } from "react";
 // Chart.js is a client-side library, so we import dynamically
 // Removed unused ChartType import
