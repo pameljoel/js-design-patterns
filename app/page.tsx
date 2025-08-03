@@ -1,12 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 // Chart.js is a client-side library, so we import dynamically
-let ChartMod: any = undefined;
-if (typeof window !== "undefined") {
-  // Chart.js ESM/CJS interop: use .default if present
-  // @ts-ignore
-  ChartMod = require("chart.js/auto");
-}
+// Removed unused ChartType import
+import ChartMod from "chart.js/auto"; // Import Chart.js auto module
 function PatternsDonutChart({
   data,
 }: {
@@ -15,8 +11,12 @@ function PatternsDonutChart({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (!ChartMod || !canvasRef.current) return;
-    const ChartCtor = ChartMod.default ? ChartMod.default : ChartMod;
-    const chart = new ChartCtor(canvasRef.current, {
+    // Chart.js ESM/CJS interop: use .default if present
+    const ChartCtor = (ChartMod as { default?: unknown })?.default ?? ChartMod;
+    const chart = new (ChartCtor as new (
+      ctx: HTMLCanvasElement,
+      config: unknown
+    ) => unknown)(canvasRef.current, {
       type: "doughnut",
       data: {
         labels: Object.keys(data),
@@ -45,7 +45,7 @@ function PatternsDonutChart({
         maintainAspectRatio: false,
       },
     });
-    return () => chart.destroy();
+    return () => (chart as { destroy: () => void }).destroy();
   }, [data]);
   return (
     <div className="w-full h-64 flex items-center justify-center">
@@ -55,7 +55,6 @@ function PatternsDonutChart({
 }
 import PatternDetail from "./patterns/PatternDetail";
 import Link from "next/link";
-import "./prism-theme.css";
 import { patternsData, Pattern } from "./patterns/patternsData";
 
 export default function Home() {
@@ -117,9 +116,9 @@ export default function Home() {
                 <p className="text-zinc-600 leading-relaxed mb-4">
                   This single-page application is designed to help you easily
                   explore and understand common JavaScript design patterns. On
-                  the left, you'll find a list of all patterns. Simply click on
-                  a pattern name to load its detailed explanation and code
-                  examples here.
+                  the left, you&apos;ll find a list of all patterns. Simply
+                  click on a pattern name to load its detailed explanation and
+                  code examples here.
                 </p>
                 <p className="text-zinc-600 leading-relaxed">
                   Each pattern comes with a brief explanation, a more

@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-let Prism: any = undefined;
-if (typeof window !== "undefined") {
-  // @ts-ignore
-  Prism = require("prismjs");
-  require("prismjs/components/prism-javascript");
-}
+import { highlight } from "sugar-high";
 
 type Pattern = {
   name: string;
@@ -19,14 +14,7 @@ type Pattern = {
 export default function PatternDetail({ pattern }: { pattern: Pattern }) {
   const briefRef = useRef<HTMLPreElement>(null);
   const simpleRef = useRef<HTMLPreElement>(null);
-  useEffect(() => {
-    if (Prism && briefRef.current) {
-      Prism.highlightElement(briefRef.current.querySelector("code"));
-    }
-    if (Prism && simpleRef.current) {
-      Prism.highlightElement(simpleRef.current.querySelector("code"));
-    }
-  }, [pattern]);
+
   if (!pattern) return null;
   return (
     <div>
@@ -41,9 +29,12 @@ export default function PatternDetail({ pattern }: { pattern: Pattern }) {
           </summary>
           <pre
             ref={briefRef}
-            className="bg-zinc-900 text-yellow-100 rounded p-4 overflow-x-auto text-sm mb-2"
+            className="bg-gray-800 rounded p-4 overflow-x-auto text-sm mb-2"
           >
-            <code className="language-js">{pattern.briefCode}</code>
+            <code
+              className="language-js"
+              dangerouslySetInnerHTML={{ __html: highlight(pattern.briefCode) }}
+            />
           </pre>
         </details>
       </div>
@@ -54,9 +45,14 @@ export default function PatternDetail({ pattern }: { pattern: Pattern }) {
           </summary>
           <pre
             ref={simpleRef}
-            className="bg-zinc-900 text-yellow-100 rounded p-4 overflow-x-auto text-sm"
+            className="bg-gray-900 rounded p-4 overflow-x-auto text-sm"
           >
-            <code className="language-js">{pattern.simplestCode}</code>
+            <code
+              className="language-js"
+              dangerouslySetInnerHTML={{
+                __html: highlight(pattern.simplestCode),
+              }}
+            />
           </pre>
         </details>
       </div>

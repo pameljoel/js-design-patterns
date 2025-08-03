@@ -2,14 +2,11 @@ import PatternDetail from "../PatternDetail";
 import { patternsData, Pattern } from "../patternsData";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { PageProps } from "@/.next/types/app/page";
 
-export default async function PatternPage({
-  params,
-}: {
-  params: { pattern: string };
-}) {
-  // Await params as required by Next.js app directory
-  const { pattern } = await Promise.resolve(params);
+export default async function PatternPage({ params }: PageProps) {
+  const resolvedParams = params ? await params : {};
+  const pattern = resolvedParams.pattern ?? "";
   const patternObj = patternsData.find(
     (p: Pattern) => p.name.toLowerCase().replace(/\s+/g, "-") === pattern
   );

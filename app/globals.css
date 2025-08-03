@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+:root {
+  --sh-class: #6babff;
+  --sh-identifier: #deedff;
+  --sh-sign: #8996a3;
+  --sh-property: #74b2ff;
+  --sh-entity: #74fffb;
+  --sh-jsxliterals: #6266d1;
+  --sh-string: #57fcee;
+  --sh-keyword: #f47067;
+  --sh-comment: #dfc0c0;
+}
+
 /* Custom styles ported from index.static.html */
 .chart-container {
   position: relative;
@@ -22,14 +34,7 @@
     height: 400px;
   }
 }
-pre {
-  background-color: #e5e7eb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
+
 details > summary {
   cursor: pointer;
   list-style: none;
