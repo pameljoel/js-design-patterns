@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Custom styles ported from index.static.html */
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 300px;
+  max-height: 350px;
+}
+@media (min-width: 640px) {
+  .chart-container {
+    max-width: 500px;
+    height: 350px;
+  }
+}
+@media (min-width: 768px) {
+  .chart-container {
+    max-width: 600px;
+    height: 400px;
+  }
+}
+pre {
+  background-color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+details > summary {
+  cursor: pointer;
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details > summary::before {
+  content: "▶ ";
+  margin-right: 0.5rem;
+}
+details[open] > summary::before {
+  content: "▼ ";
+}
+code {
+  font-family: "Fira Code", "Roboto Mono", monospace;
+}
