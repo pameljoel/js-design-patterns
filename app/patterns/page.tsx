@@ -1,3 +1,10 @@
+export async function generateMetadata() {
+  return {
+    title: "All JavaScript Design Patterns",
+    description:
+      "Browse all JavaScript design patterns with explanations and code examples.",
+  };
+}
 import Link from "next/link";
 import { patternsData } from "./patternsData";
 
